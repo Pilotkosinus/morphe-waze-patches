@@ -8,6 +8,7 @@ Morphe patches for [Waze](https://play.google.com/store/apps/details?id=com.waze
 |---|---|
 | **Waze – Patched YouTube Music Support** | Lets Waze use a YouTube Music app patched with Morphe (`app.morphe.android.apps.youtube.music`) in its built-in music player. Without it, Waze reports YouTube Music as "not installed". |
 | **Morphe Patch Settings** | Adds **Morphe Patch Einstellungen** (*Morphe patch settings*) at the bottom of the Waze settings, with a switch for each Morphe patch. |
+| **Always Play Speed Camera Sound** | Waze shows speed camera alerts on screen, but plays the alert sound only when you drive above the speed limit. This patch plays the sound for every speed camera. |
 | **Google Assistant Button** | Adds a button below the audio and sound buttons of the map. It opens the voice assistant of the device (Google Assistant or Gemini) on top of Waze, so the map stays visible. |
 
 Only Waze is patched. YouTube Music and the assistant app are not changed.
@@ -29,9 +30,9 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.2.0](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.2.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.3.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.3.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
 <details open>
-<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -41,6 +42,7 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Always Play Speed Camera Sound](#always-play-speed-camera-sound) | Waze shows speed camera alerts on screen, but plays the alert sound only when you drive above the speed limit. This patch plays the sound for every speed camera. Can be turned off in the Morphe patch settings. |  |
 | [Google Assistant Button](#google-assistant-button) | Adds a button below the audio and sound buttons of the map. It opens the voice assistant of the device on top of Waze, so the map stays visible. |  |
 | [Morphe Patch Settings](#morphe-patch-settings) | Adds "Morphe Patch Einstellungen" at the bottom of the Waze settings. It shows all applied Morphe patches with a switch to turn each of them on or off. |  |
 | [Waze – Patched YouTube Music Support](#waze-patched-youtube-music-support) | Adds a repackaged YouTube Music app (for example patched with Morphe) to the audio partners of Waze, so it can be selected and controlled from the Waze music player. The original YouTube Music app keeps working. | • Package names |
@@ -63,6 +65,7 @@ Open **Waze → Settings → Morphe Patch Einstellungen** (at the bottom, above 
 |---|---|
 | Patched YouTube Music Support | After restarting Waze. The page shows a **Restart** button. |
 | Google Assistant Button | Immediately. The button appears or disappears on the map. |
+| Always play speed camera sound (*Blitzer-Warnton immer abspielen*) | Immediately. Off restores the original Waze value. |
 | ↳ Listen immediately (*Sofort zuhören*) | Immediately. On: the assistant starts listening right after tapping the button. Off: the assistant only opens, tap its microphone to speak. Only available while the button is on. |
 
 * The settings are saved in Waze (`shared_prefs/morphe_patch_settings.xml`) and are kept after a restart.
@@ -126,6 +129,19 @@ The Waze settings are a tree of obfuscated node classes that is built in code.
 
 The settings page reads the Waze day/night mode from `AppCompatDelegate` (found by its log message).
 
+### Always Play Speed Camera Sound
+
+The native alerting code of Waze (`libwaze.so`) reads the configuration value
+`Play Speed Camera Sound Below Speed Limit`
+(`ConfigValues.CONFIG_VALUE_ALERTS_PLAY_SPEED_CAMERA_SOUND_BELOW_SPEED_LIMIT`, default `false`).
+While it is `false`, the speed camera alert is shown on screen, but the sound only plays above the speed limit.
+
+The extension sets the value to `true` with `ConfigManager.setConfigValueBool()`, which writes to the native
+configuration. It is applied on app start (`NativeManager.flushOnAppStartedEvents()`) and again after every
+configuration sync with the Waze server (`ConfigManager.onConfigSyncedFromServer()`/`onConfigSyncedToServer()`),
+because the server can change configuration values. When the feature is turned off, the original value is restored.
+All names used are not obfuscated.
+
 ### Google Assistant Button
 
 The map buttons are a Jetpack Compose column (`ButtonPackPortrait`) or row (`ButtonPackLandscape`).
@@ -153,6 +169,8 @@ deep link `waze://?a=settings`.
 | Listen immediately on: assistant records right away (`ACTION_VOICE_COMMAND`); off: no recording (`showAssist`) | ✅ |
 | Option is disabled while the assistant button is off | ✅ |
 | Button slides out with the other buttons when the map is moved and back in after re-centering; no tap while hidden | ✅ |
+| Speed camera sound: native value changed from `false` to `true`, kept after restart, restored when turned off | ✅ |
+| Speed camera sound actually played below the speed limit while driving | ⚠️ not tested (needs a signed-in Waze and a drive) |
 | Assistant button during active navigation | ⚠️ not tested (needs a signed-in Waze) |
 | Landscape layout | ⚠️ not tested |
 | Play/pause/skip of YouTube Music from Waze | ⚠️ not tested |
@@ -191,11 +209,13 @@ patches/src/main/kotlin/app/wazeytm/patches/
 └── waze/
     ├── music/             Waze – Patched YouTube Music Support
     ├── settings/          Morphe Patch Settings
-    └── assistant/         Google Assistant Button
+    ├── assistant/         Google Assistant Button
+    └── alerts/            Always Play Speed Camera Sound
 extensions/waze/src/main/java/app/wazeytm/extension/waze/
 ├── PatchedYouTubeMusicSupportPatch.java
 ├── settings/              MorpheSettings (central config), PatchRegistry, settings page, menu hook
-└── assistant/             Compose hook, button view, assistant launcher
+├── assistant/             Compose hook, button view, assistant launcher
+└── alerts/                Speed camera sound configuration
 ```
 
 ### Adding a new patch to the settings
