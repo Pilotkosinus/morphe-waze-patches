@@ -1,3 +1,9 @@
+## [1.1.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.0.0...v1.1.0-dev.1) (2026-10-15)
+
+### ✨ New Features
+
+* Add "Morphe Patch Settings" and "Google Assistant Button" patches ([18b5767](https://github.com/Pilotkosinus/morphe-waze-patches/commit/18b5767ffa1871b889436dd3a97e5a08a1671dfc))
+
 ## 1.0.0 (2026-10-15)
 
 ### ✨ New Features
