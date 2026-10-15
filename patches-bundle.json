@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-15T17:03:12",
-  "description": "## [1.1.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.0.0...v1.1.0-dev.1) (2026-10-15)\n\n### ✨ New Features\n\n* Add \"Morphe Patch Settings\" and \"Google Assistant Button\" patches ([18b5767](https://github.com/Pilotkosinus/morphe-waze-patches/commit/18b5767ffa1871b889436dd3a97e5a08a1671dfc))",
-  "download_url": "https://github.com/Pilotkosinus/morphe-waze-patches/releases/download/v1.1.0-dev.1/patches-1.1.0-dev.1.mpp",
+  "created_at": "2026-10-15T17:11:00",
+  "description": "## [1.1.0](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.0.0...v1.1.0) (2026-10-15)\n\n### ✨ New Features\n\n* Add \"Morphe Patch Settings\" and \"Google Assistant Button\" patches ([18b5767](https://github.com/Pilotkosinus/morphe-waze-patches/commit/18b5767ffa1871b889436dd3a97e5a08a1671dfc))",
+  "download_url": "https://github.com/Pilotkosinus/morphe-waze-patches/releases/download/v1.1.0/patches-1.1.0.mpp",
   "signature_download_url": "",
-  "version": "1.1.0-dev.1"
+  "version": "1.1.0"
 }
