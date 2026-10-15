@@ -4,13 +4,13 @@ Morphe patches for [Waze](https://play.google.com/store/apps/details?id=com.waze
 
 ## ❓ About
 
-Waze can control YouTube Music from its built-in music player, but only if the app is installed
-under the original package name `com.google.android.apps.youtube.music`.
-A YouTube Music app patched with Morphe (`app.morphe.android.apps.youtube.music`) is reported as
-"not installed".
+| Patch | What it does |
+|---|---|
+| **Waze – Patched YouTube Music Support** | Lets Waze use a YouTube Music app patched with Morphe (`app.morphe.android.apps.youtube.music`) in its built-in music player. Without it, Waze reports YouTube Music as "not installed". |
+| **Morphe Patch Settings** | Adds **Morphe Patch Einstellungen** (*Morphe patch settings*) at the bottom of the Waze settings, with a switch for each Morphe patch. |
+| **Google Assistant Button** | Adds a button below the audio and sound buttons of the map. It opens the voice assistant of the device (Google Assistant or Gemini) on top of Waze, so the map stays visible. |
 
-**Waze – Patched YouTube Music Support** patches Waze, not YouTube Music, so Waze recognizes the patched
-YouTube Music app and can control it. The original YouTube Music app and all other music apps keep working.
+Only Waze is patched. YouTube Music and the assistant app are not changed.
 
 ## 🚀 Add these patches to Morphe
 
@@ -29,9 +29,9 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.0](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.0.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+> **[v1.1.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.1.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
-<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -41,13 +41,52 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Google Assistant Button](#google-assistant-button) | Adds a button below the audio and sound buttons of the map. It opens the voice assistant of the device on top of Waze, so the map stays visible. |  |
+| [Morphe Patch Settings](#morphe-patch-settings) | Adds "Morphe Patch Einstellungen" at the bottom of the Waze settings. It shows all applied Morphe patches with a switch to turn each of them on or off. |  |
 | [Waze – Patched YouTube Music Support](#waze-patched-youtube-music-support) | Adds a repackaged YouTube Music app (for example patched with Morphe) to the audio partners of Waze, so it can be selected and controlled from the Waze music player. The original YouTube Music app keeps working. | • Package names |
 
 </details>
 
 <!-- PATCHES_END -->
 
+## 📸 Screenshots
+
+| Assistant button on the map | Assistant on top of Waze | Settings entry | Morphe patch settings |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/images/assistant-button.png" width="200"> | <img src="docs/images/assistant-overlay.png" width="200"> | <img src="docs/images/settings-entry.png" width="200"> | <img src="docs/images/morphe-settings-restart.png" width="200"> |
+
+## ⚙️ Turning features on and off
+
+Open **Waze → Settings → Morphe Patch Einstellungen** (at the bottom, above the version number).
+
+| Switch | When the change applies |
+|---|---|
+| Patched YouTube Music Support | After restarting Waze. The page shows a **Restart** button. |
+| Google Assistant Button | Immediately. The button appears or disappears on the map. |
+
+* The settings are saved in Waze (`shared_prefs/morphe_patch_settings.xml`) and are kept after a restart.
+* All features are on by default.
+* Only patches that were applied in Morphe Manager can be switched. A patch that was not
+  applied is shown as "not included" and cannot be turned on, because its code is not in the APK.
+* Each patch also works without the settings patch. It is then always on.
+
+## 🎙️ Google Assistant Button
+
+The button calls [`Activity.showAssist()`](https://developer.android.com/reference/android/app/Activity#showAssist(android.os.Bundle)),
+the official way for an app to show the assistant that is selected as *digital assistant app*
+in the Android settings. This is the same as long-pressing the home button: the assistant shows its own
+overlay on top of Waze, and Waze stays the navigation app below it.
+
+* The look of the assistant overlay is controlled by the assistant app (Google Assistant or Gemini), not by Waze.
+  Waze cannot make it more transparent.
+* If no assistant is selected, the button falls back to `Intent.ACTION_VOICE_COMMAND`, which can open the
+  assistant full screen. If that is not available either, a message explains how to select an assistant.
+* There is no separate speech recognition. All voice commands are handled by the real assistant.
+* The button has the same size (56dp), shadow, colors (day and night) and spacing as the Waze map buttons.
+
 ## 🔍 How it works
+
+### Waze – Patched YouTube Music Support
 
 Waze 5.25.0.1, class `com.waze.sdk.SdkConfiguration`:
 
@@ -60,8 +99,6 @@ Waze 5.25.0.1, class `com.waze.sdk.SdkConfiguration`:
 Waze does not check the partner app's signature, and YouTube Music does not check Waze's signature.
 The `com.waze.sdk.audio.ACTION_INIT` intent is already declared in Waze's `<queries>`.
 
-The patch changes two methods:
-
 | Method | Change |
 |---|---|
 | `SdkConfiguration.updateAppList()` | After the server list is loaded, adds every installed repackaged YouTube Music with the name and scope of the original YouTube Music entry. |
@@ -70,15 +107,49 @@ The patch changes two methods:
 Patched YouTube Music apps are detected by their `MusicWazeBroadcastReceiver`, whatever the package name.
 The `packageNames` patch option can add more package names (default `app.morphe.android.apps.youtube.music`).
 
+### Morphe Patch Settings
+
+The Waze settings are a tree of obfuscated node classes that is built in code.
+
+| Location | Change |
+|---|---|
+| Settings page constructor (found from the `SETTINGS_MAIN_SETTINGS` page) | For the page `settings_main`, the extension adds a button node before the version text. The button class and its click listener interface are taken from the `ABOUT_SETTINGS` entry at patch time. |
+| `AndroidManifest.xml` | Declares the settings activity of the extension. |
+| Resources | Adds the title (`morphe_settings_title`, English and German) and the icon. |
+
+The settings page reads the Waze day/night mode from `AppCompatDelegate` (found by its log message).
+
+### Google Assistant Button
+
+The map buttons are a Jetpack Compose column (`ButtonPackPortrait`) or row (`ButtonPackLandscape`).
+The patch calls the extension right before the column/row is closed, and the extension adds the button with
+Compose's `AndroidView`. The methods are found by their Compose trace strings
+(`com.waze.main_screen.button_pack.ButtonPackPortrait (`), which are not obfuscated.
+
 ## 🧪 Testing status
 
-Tested on an Android 16 emulator with Waze 5.25.0.1 and YouTube Music 9.20.53 (Morphe):
+Tested with Waze 5.25.0.1 on an Android 16 emulator (Google Play image, assistant: Gemini in the Google app).
+Waze cannot sign in on the emulator (Play Integrity), not even unpatched, so the map was opened with the
+deep link `waze://?a=settings`.
 
-* ✅ The patched YouTube Music is added to the Waze partner list (logcat tag `WazePatchedYTMusic`).
-* ✅ SDK handshake works: YouTube Music binds to Waze's `SdkService`, and Waze connects to YouTube Music's
-  `MusicBrowserService`. The unpatched Waze rejects the same handshake.
-* ⚠️ Selecting the app in the Waze UI and play/pause/skip were not tested yet. Waze login does not work on
-  the emulator (Play Integrity), not even with the unpatched app. Reports from real devices are welcome.
+| Test | Result |
+|---|---|
+| Patched YouTube Music added to the Waze partner list, SDK handshake and `MusicBrowserService` connection | ✅ |
+| Patched YouTube Music shown as audio app on the map | ✅ real device (user report) |
+| Settings entry at the bottom of the Waze settings, page opens, day/night colors | ✅ |
+| Switches, saved after restart, restart button, YouTube Music support off after restart | ✅ |
+| Assistant button below the sound button with the same size, color and spacing | ✅ |
+| Assistant button hides/shows immediately when switched | ✅ |
+| Button opens the assistant as overlay on top of Waze (`showAssist`) | ✅ |
+| Assistant button during active navigation | ⚠️ not tested (needs a signed-in Waze) |
+| Landscape layout | ⚠️ not tested |
+| Play/pause/skip of YouTube Music from Waze | ⚠️ not tested |
+
+## ✅ Compatibility
+
+* Waze **5.25.0.1** (tested). Other versions are marked as experimental. The fingerprints use strings and
+  names that are not obfuscated, so newer versions should usually work.
+* Android 12 or newer (minimum of Waze).
 
 ## 🧑‍💻 Development
 
@@ -91,6 +162,8 @@ Apply the `.mpp` with [Morphe Desktop](https://github.com/MorpheApp/morphe-deskt
 
 ```sh
 java -jar morphe-desktop-all.jar patch --patches=patches/build/libs/patches-1.0.0.mpp waze.apks
+adb uninstall com.waze
+adb install waze-patched.apk
 ```
 
 `waze.apks` is a zip of the Waze split APKs (`adb shell pm path com.waze`).
@@ -98,13 +171,36 @@ java -jar morphe-desktop-all.jar patch --patches=patches/build/libs/patches-1.0.
 Building needs a GitHub token for the Morphe Gradle plugin on GitHub Packages
 (`gpr.user`/`gpr.key` in `~/.gradle/gradle.properties`, or `GITHUB_ACTOR`/`GITHUB_TOKEN`).
 
+### Project structure
+
+```text
+patches/src/main/kotlin/app/wazeytm/patches/
+├── shared/                Compatibility, patch registry helpers
+└── waze/
+    ├── music/             Waze – Patched YouTube Music Support
+    ├── settings/          Morphe Patch Settings
+    └── assistant/         Google Assistant Button
+extensions/waze/src/main/java/app/wazeytm/extension/waze/
+├── PatchedYouTubeMusicSupportPatch.java
+├── settings/              MorpheSettings (central config), PatchRegistry, settings page, menu hook
+└── assistant/             Compose hook, button view, assistant launcher
+```
+
+### Adding a new patch to the settings
+
+1. Add a method returning `false` to `PatchRegistry` and call `markPatchIncluded("<method>")` in the patch.
+2. Add an entry to `MorpheSettings.Feature` with title, description and `requiresRestart`.
+3. Check `MorpheSettings.isEnabled(Feature.X)` in the extension code of the patch.
+
 ### Updating for a new Waze version
 
-1. Decompile `com.waze.sdk.SdkConfiguration` with jadx.
-2. Check that `updateAppList()` still calls `configGetSdkConfigurationNTV()` followed by `move-result-object`,
-   and that `getCustomizedAppIconUrl(Resources, String)` still exists. These names are not obfuscated.
-3. Check that the SDK service still authorizes by package name (search for `isWhiteListed`).
-4. Add the version as `AppTarget` in `Constants.kt`.
+1. Decompile Waze with jadx.
+2. YouTube Music: `SdkConfiguration.updateAppList()` still calls `configGetSdkConfigurationNTV()` followed by
+   `move-result-object`, and `getCustomizedAppIconUrl(Resources, String)` still exists.
+3. Settings: the main settings still use the strings `ABOUT_SETTINGS` and `SETTINGS_MAIN_SETTINGS`.
+4. Assistant: the trace strings `com.waze.main_screen.button_pack.ButtonPackPortrait (` and
+   `...ButtonPackLandscape (` still exist and the methods call `Composer.endNode()`.
+5. Add the version as `AppTarget` in `Constants.kt`.
 
 Releases are created by [release.yml](.github/workflows/release.yml) for `feat:`/`fix:` commits on `main` (stable) and `dev` (pre-release).
 

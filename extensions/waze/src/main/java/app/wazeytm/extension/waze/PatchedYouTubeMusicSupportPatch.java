@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.waze.sdk.SdkConfiguration;
 
+import app.wazeytm.extension.waze.settings.MorpheSettings;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -67,6 +69,11 @@ public final class PatchedYouTubeMusicSupportPatch {
      */
     public static void onSdkConfigurationLoaded(SdkConfiguration config) {
         try {
+            if (!MorpheSettings.isEnabled(MorpheSettings.Feature.PATCHED_YOUTUBE_MUSIC)) {
+                Log.i(TAG, "Disabled in Morphe settings");
+                return;
+            }
+
             if (config == null || config.PackageNames == null || config.AppNames == null
                     || config.Scopes == null || config.InstallationUrls == null) {
                 return;
