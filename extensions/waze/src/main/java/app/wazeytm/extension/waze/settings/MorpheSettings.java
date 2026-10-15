@@ -22,6 +22,7 @@ public final class MorpheSettings {
         PATCHED_YOUTUBE_MUSIC(
                 "patched_youtube_music_support",
                 "Patched YouTube Music Support",
+                "Patched YouTube Music Support",
                 "Gepatchtes YouTube Music in der Waze-Musiksteuerung anbieten (z. B. Morphe/ReVanced).",
                 "Offer patched YouTube Music (e.g. Morphe/ReVanced) in the Waze music controls.",
                 true
@@ -34,6 +35,7 @@ public final class MorpheSettings {
         GOOGLE_ASSISTANT_BUTTON(
                 "google_assistant_button",
                 "Google Assistant Button",
+                "Google Assistant Button",
                 "Zeigt unter den Kartenbuttons einen Button, der den Sprachassistenten des Geräts über Waze öffnet.",
                 "Shows a map button below the other map buttons that opens the device assistant on top of Waze.",
                 false
@@ -42,10 +44,29 @@ public final class MorpheSettings {
             public boolean isIncluded() {
                 return PatchRegistry.googleAssistantButtonIncluded();
             }
+        },
+        ASSISTANT_LISTEN_IMMEDIATELY(
+                "google_assistant_listen_immediately",
+                "Sofort zuhören",
+                "Listen immediately",
+                "Der Assistent hört nach dem Antippen direkt zu. Aus: Der Assistent öffnet sich nur, das Mikrofon muss extra angetippt werden.",
+                "The assistant listens right after tapping the button. Off: the assistant only opens, tap its microphone to speak.",
+                false
+        ) {
+            @Override
+            public boolean isIncluded() {
+                return PatchRegistry.googleAssistantButtonIncluded();
+            }
+
+            @Override
+            public Feature getParent() {
+                return GOOGLE_ASSISTANT_BUTTON;
+            }
         };
 
         public final String key;
-        private final String title;
+        private final String titleDe;
+        private final String titleEn;
         private final String descriptionDe;
         private final String descriptionEn;
         /**
@@ -53,9 +74,11 @@ public final class MorpheSettings {
          */
         public final boolean requiresRestart;
 
-        Feature(String key, String title, String descriptionDe, String descriptionEn, boolean requiresRestart) {
+        Feature(String key, String titleDe, String titleEn, String descriptionDe, String descriptionEn,
+                boolean requiresRestart) {
             this.key = key;
-            this.title = title;
+            this.titleDe = titleDe;
+            this.titleEn = titleEn;
             this.descriptionDe = descriptionDe;
             this.descriptionEn = descriptionEn;
             this.requiresRestart = requiresRestart;
@@ -66,8 +89,16 @@ public final class MorpheSettings {
          */
         public abstract boolean isIncluded();
 
+        /**
+         * @return The feature this option belongs to, or null for a patch.
+         * An option is shown below its parent and only works if the parent is enabled.
+         */
+        public Feature getParent() {
+            return null;
+        }
+
         public String getTitle() {
-            return title;
+            return isGerman() ? titleDe : titleEn;
         }
 
         public String getDescription() {

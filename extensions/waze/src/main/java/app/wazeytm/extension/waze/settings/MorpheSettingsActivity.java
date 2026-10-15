@@ -25,7 +25,9 @@ import android.widget.TextView;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 
 import static app.wazeytm.extension.waze.settings.MorpheSettings.text;
@@ -37,6 +39,8 @@ import static app.wazeytm.extension.waze.settings.MorpheSettings.text;
 @SuppressWarnings("deprecation")
 public final class MorpheSettingsActivity extends Activity {
     private final Set<MorpheSettings.Feature> changedRestartFeatures = EnumSet.noneOf(MorpheSettings.Feature.class);
+    private final Map<MorpheSettings.Feature, View> rows = new EnumMap<>(MorpheSettings.Feature.class);
+    private final Map<MorpheSettings.Feature, Switch> toggles = new EnumMap<>(MorpheSettings.Feature.class);
     private View restartBanner;
 
     private int backgroundColor;
@@ -135,6 +139,8 @@ public final class MorpheSettingsActivity extends Activity {
             content.addView(createDivider());
         }
 
+        updateOptionRows();
+
         TextView footer = createText(text(
                 "Schalter wirken nur auf Patches, die beim Patchen eingebaut wurden. "
                         + "Nicht eingebaute Patches lassen sich hier nicht aktivieren.",
@@ -194,12 +200,14 @@ public final class MorpheSettingsActivity extends Activity {
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setBackgroundColor(surfaceColor);
-        row.setPadding(dp(16), dp(12), dp(16), dp(12));
+        // Options of a patch are indented below it.
+        int indent = feature.getParent() == null ? dp(16) : dp(40);
+        row.setPadding(indent, dp(12), dp(16), dp(12));
 
         LinearLayout texts = new LinearLayout(this);
         texts.setOrientation(LinearLayout.VERTICAL);
 
-        TextView title = createText(feature.getTitle(), 16, textColor);
+        TextView title = createText(feature.getTitle(), feature.getParent() == null ? 16 : 15, textColor);
         title.setTypeface(boldFont);
         texts.addView(title);
 
@@ -230,6 +238,7 @@ public final class MorpheSettingsActivity extends Activity {
         toggle.setTrackTintList(new ColorStateList(states, new int[]{primaryColor, secondaryTextColor}));
         toggle.setOnCheckedChangeListener((button, checked) -> {
             MorpheSettings.setEnabled(feature, checked);
+            updateOptionRows();
             if (feature.requiresRestart) {
                 if (!changedRestartFeatures.remove(feature)) changedRestartFeatures.add(feature);
                 restartBanner.setVisibility(changedRestartFeatures.isEmpty() ? View.GONE : View.VISIBLE);
@@ -242,11 +251,31 @@ public final class MorpheSettingsActivity extends Activity {
 
         if (included) {
             row.setBackground(selectableBackground());
-            row.setOnClickListener(v -> toggle.toggle());
+            row.setOnClickListener(v -> {
+                if (toggle.isEnabled()) toggle.toggle();
+            });
         } else {
             row.setAlpha(0.6f);
         }
+        rows.put(feature, row);
+        toggles.put(feature, toggle);
         return row;
+    }
+
+    /**
+     * Options only work while their patch is enabled. Disable them otherwise.
+     */
+    private void updateOptionRows() {
+        for (Map.Entry<MorpheSettings.Feature, Switch> entry : toggles.entrySet()) {
+            MorpheSettings.Feature feature = entry.getKey();
+            MorpheSettings.Feature parent = feature.getParent();
+            if (parent == null || !feature.isIncluded()) continue;
+            Switch parentToggle = toggles.get(parent);
+            boolean active = parentToggle != null && parentToggle.isChecked();
+            entry.getValue().setEnabled(active);
+            View row = rows.get(feature);
+            if (row != null) row.setAlpha(active ? 1f : 0.5f);
+        }
     }
 
     private View createRestartBanner() {
