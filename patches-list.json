@@ -1,5 +1,49 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "0.0.0",
-  "patches": []
+  "version": "1.0.0-dev.1",
+  "patches": [
+    {
+      "name": "Waze – Patched YouTube Music Support",
+      "description": "Adds a repackaged YouTube Music app (for example patched with Morphe) to the audio partners of Waze, so it can be selected and controlled from the Waze music player. The original YouTube Music app keeps working.",
+      "default": true,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "com.waze",
+          "name": "Waze",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#33CCFF",
+          "signatures": null,
+          "targets": [
+            {
+              "version": null,
+              "versionCodes": null,
+              "isExperimental": true,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "5.25.0.1",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "packageNames",
+          "title": "Package names",
+          "description": "Comma separated package names of patched YouTube Music apps. Installed repackaged YouTube Music apps are also detected automatically.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "app.morphe.android.apps.youtube.music",
+          "values": null
+        }
+      ]
+    }
+  ]
 }

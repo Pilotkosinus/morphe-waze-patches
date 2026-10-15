@@ -29,12 +29,21 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
+> **[v1.0.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.0.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;1 patches total
+<details open>
+<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;1 patch</summary>
+<br>
 
-<!-- Do not modify this section by hand. The patch list is generated when release.yml creates a new release. -->
+**🎯 Supported versions:**
 
-#### The patch list is shown here after the first release.
+| 5.25.0.1 |
+| :---: |
 
-&nbsp;
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Waze – Patched YouTube Music Support](#waze-patched-youtube-music-support) | Adds a repackaged YouTube Music app (for example patched with Morphe) to the audio partners of Waze, so it can be selected and controlled from the Waze music player. The original YouTube Music app keeps working. | • Package names |
+
+</details>
 
 <!-- PATCHES_END -->
 
