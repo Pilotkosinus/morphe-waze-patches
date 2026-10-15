@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-15T17:29:16",
-  "description": "## [1.2.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.1.0...v1.2.0-dev.1) (2026-10-15)\n\n### 🐛 Bug Fixes\n\n* Hide the assistant button together with the other map buttons ([7674db3](https://github.com/Pilotkosinus/morphe-waze-patches/commit/7674db375eba170cdfc2af123d555f7b22f3643d))\n\n### ✨ New Features\n\n* Add \"Listen immediately\" option for the assistant button ([49f2b57](https://github.com/Pilotkosinus/morphe-waze-patches/commit/49f2b57f9608b5240bcd305e1a7e61464f6abef9))",
-  "download_url": "https://github.com/Pilotkosinus/morphe-waze-patches/releases/download/v1.2.0-dev.1/patches-1.2.0-dev.1.mpp",
+  "created_at": "2026-10-15T17:38:14",
+  "description": "## [1.2.0](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.1.0...v1.2.0) (2026-10-15)\n\n### 🐛 Bug Fixes\n\n* Hide the assistant button together with the other map buttons ([7674db3](https://github.com/Pilotkosinus/morphe-waze-patches/commit/7674db375eba170cdfc2af123d555f7b22f3643d))\n\n### ✨ New Features\n\n* Add \"Listen immediately\" option for the assistant button ([49f2b57](https://github.com/Pilotkosinus/morphe-waze-patches/commit/49f2b57f9608b5240bcd305e1a7e61464f6abef9))",
+  "download_url": "https://github.com/Pilotkosinus/morphe-waze-patches/releases/download/v1.2.0/patches-1.2.0.mpp",
   "signature_download_url": "",
-  "version": "1.2.0-dev.1"
+  "version": "1.2.0"
 }

@@ -1,3 +1,13 @@
+## [1.2.0](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.1.0...v1.2.0) (2026-10-15)
+
+### 🐛 Bug Fixes
+
+* Hide the assistant button together with the other map buttons ([7674db3](https://github.com/Pilotkosinus/morphe-waze-patches/commit/7674db375eba170cdfc2af123d555f7b22f3643d))
+
+### ✨ New Features
+
+* Add "Listen immediately" option for the assistant button ([49f2b57](https://github.com/Pilotkosinus/morphe-waze-patches/commit/49f2b57f9608b5240bcd305e1a7e61464f6abef9))
+
 ## [1.2.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.1.0...v1.2.0-dev.1) (2026-10-15)
 
 ### 🐛 Bug Fixes
