@@ -31,6 +31,29 @@ public final class AssistantButtonHook {
     private static boolean failed;
 
     /**
+     * Offset in px that Waze applies to every button of the button pack. Waze slides the buttons
+     * off screen with it, for example while the map is moved or zoomed.
+     */
+    private static volatile int packOffsetX;
+    private static volatile int packOffsetY;
+
+    /**
+     * Injection point. Called with the offset arguments of every {@code ButtonPackButton(...)} call.
+     */
+    public static void setButtonOffset(int x, int y) {
+        packOffsetX = x;
+        packOffsetY = y;
+    }
+
+    static int getPackOffsetX() {
+        return packOffsetX;
+    }
+
+    static int getPackOffsetY() {
+        return packOffsetY;
+    }
+
+    /**
      * Injection point inside the button pack composable.
      */
     public static void addButton(Composer composer) {
@@ -41,6 +64,8 @@ public final class AssistantButtonHook {
             if (androidViewMethod == null) initialize();
             // AndroidView(factory, modifier, update, composer, $changed, $default)
             androidViewMethod.invoke(null, factory, modifier, update, composer, 0, 0);
+            // The button pack recomposes on every animation frame of the offset.
+            AssistantButtonView.applyPackOffset();
         } catch (Exception ex) {
             failed = true;
             Log.e(TAG, "Could not add assistant button", ex);
