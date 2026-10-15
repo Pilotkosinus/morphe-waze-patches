@@ -30,9 +30,9 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.2.0](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.2.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.3.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.3.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
 <details open>
-<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
+<summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -42,6 +42,7 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
+| [Always Play Speed Camera Sound](#always-play-speed-camera-sound) | Waze shows speed camera alerts on screen, but plays the alert sound only when you drive above the speed limit. This patch plays the sound for every speed camera. Can be turned off in the Morphe patch settings. |  |
 | [Google Assistant Button](#google-assistant-button) | Adds a button below the audio and sound buttons of the map. It opens the voice assistant of the device on top of Waze, so the map stays visible. |  |
 | [Morphe Patch Settings](#morphe-patch-settings) | Adds "Morphe Patch Einstellungen" at the bottom of the Waze settings. It shows all applied Morphe patches with a switch to turn each of them on or off. |  |
 | [Waze – Patched YouTube Music Support](#waze-patched-youtube-music-support) | Adds a repackaged YouTube Music app (for example patched with Morphe) to the audio partners of Waze, so it can be selected and controlled from the Waze music player. The original YouTube Music app keeps working. | • Package names |
