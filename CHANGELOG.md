@@ -1,3 +1,9 @@
+## [1.4.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.3.0...v1.4.0-dev.1) (2026-10-15)
+
+### ✨ New Features
+
+* Show the author and a link to the repository in the settings ([0b46d4c](https://github.com/Pilotkosinus/morphe-waze-patches/commit/0b46d4cc7cc367de099010020c10c0433593f84a))
+
 ## [1.3.0](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.2.0...v1.3.0) (2026-10-15)
 
 ### ✨ New Features
