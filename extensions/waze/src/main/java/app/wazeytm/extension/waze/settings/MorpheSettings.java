@@ -62,6 +62,24 @@ public final class MorpheSettings {
             public Feature getParent() {
                 return GOOGLE_ASSISTANT_BUTTON;
             }
+        },
+        SPEED_CAMERA_SOUND_ALWAYS(
+                "speed_camera_sound_always",
+                "Blitzer-Warnton immer abspielen",
+                "Always play speed camera sound",
+                "Waze spielt den Warnton für Blitzer sonst nur, wenn du zu schnell fährst. Mit dieser Option kommt der Ton bei jedem Blitzer.",
+                "Waze otherwise plays the speed camera sound only when you drive too fast. With this option the sound plays for every speed camera.",
+                false
+        ) {
+            @Override
+            public boolean isIncluded() {
+                return PatchRegistry.speedCameraSoundAlwaysIncluded();
+            }
+
+            @Override
+            void onChanged() {
+                app.wazeytm.extension.waze.alerts.SpeedCameraSoundPatch.apply();
+            }
         };
 
         public final String key;
@@ -88,6 +106,12 @@ public final class MorpheSettings {
          * @return If the bytecode patch of this feature was applied to the APK.
          */
         public abstract boolean isIncluded();
+
+        /**
+         * Called after the user changed the switch. Features that apply a change right away override it.
+         */
+        void onChanged() {
+        }
 
         /**
          * @return The feature this option belongs to, or null for a patch.
@@ -123,6 +147,7 @@ public final class MorpheSettings {
         if (preferences == null) return;
         preferences.edit().putBoolean(feature.key, enabled).apply();
         Log.i(TAG, feature.key + " = " + enabled);
+        feature.onChanged();
     }
 
     public static void registerListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {

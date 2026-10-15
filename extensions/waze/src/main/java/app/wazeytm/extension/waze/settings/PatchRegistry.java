@@ -26,4 +26,8 @@ public final class PatchRegistry {
     public static boolean googleAssistantButtonIncluded() {
         return false;
     }
+
+    public static boolean speedCameraSoundAlwaysIncluded() {
+        return false;
+    }
 }
