@@ -11,6 +11,11 @@ import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import app.wazeytm.extension.waze.settings.MorpheSettings;
 
 /**
@@ -28,6 +33,8 @@ public final class AssistantButtonView extends View implements SharedPreferences
     private static final int ICON_SIZE_DP = 28;
     private static final float SHADOW_ELEVATION_DP = 3f;
     private static final float PRESSED_SCALE = 0.9f;
+
+    private static final List<WeakReference<AssistantButtonView>> attachedViews = new ArrayList<>();
 
     private final Paint circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Drawable icon;
@@ -72,8 +79,31 @@ public final class AssistantButtonView extends View implements SharedPreferences
         boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         int margin = dp(SHADOW_MARGIN_DP);
         // Portrait: column aligned to the end. Landscape: row aligned to the top.
-        setTranslationX(landscape ? -margin : margin);
-        setTranslationY(-margin);
+        baseTranslationX = landscape ? -margin : margin;
+        baseTranslationY = -margin;
+        updateTranslation();
+    }
+
+    private int baseTranslationX;
+    private int baseTranslationY;
+
+    /**
+     * Moves the button with the same offset that Waze applies to its own map buttons.
+     */
+    private void updateTranslation() {
+        setTranslationX(baseTranslationX + AssistantButtonHook.getPackOffsetX());
+        setTranslationY(baseTranslationY + AssistantButtonHook.getPackOffsetY());
+    }
+
+    static void applyPackOffset() {
+        synchronized (attachedViews) {
+            Iterator<WeakReference<AssistantButtonView>> iterator = attachedViews.iterator();
+            while (iterator.hasNext()) {
+                AssistantButtonView view = iterator.next().get();
+                if (view == null) iterator.remove();
+                else view.updateTranslation();
+            }
+        }
     }
 
     @Override
@@ -110,6 +140,9 @@ public final class AssistantButtonView extends View implements SharedPreferences
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        synchronized (attachedViews) {
+            attachedViews.add(new WeakReference<>(this));
+        }
         MorpheSettings.registerListener(this);
         updateVisibility();
     }
@@ -117,6 +150,13 @@ public final class AssistantButtonView extends View implements SharedPreferences
     @Override
     protected void onDetachedFromWindow() {
         MorpheSettings.unregisterListener(this);
+        synchronized (attachedViews) {
+            Iterator<WeakReference<AssistantButtonView>> iterator = attachedViews.iterator();
+            while (iterator.hasNext()) {
+                AssistantButtonView view = iterator.next().get();
+                if (view == null || view == this) iterator.remove();
+            }
+        }
         super.onDetachedFromWindow();
     }
 

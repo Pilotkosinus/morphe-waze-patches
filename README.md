@@ -29,7 +29,7 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 ## 🩹 Patches list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.1.0](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.1.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
+> **[v1.2.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/releases/tag/v1.2.0-dev.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`dev`&nbsp;&nbsp;•&nbsp;&nbsp;3 patches total
 <details open>
 <summary>📦 Waze&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
@@ -53,7 +53,7 @@ Then select Waze in Morphe Manager, apply the patches and install the patched Wa
 
 | Assistant button on the map | Assistant on top of Waze | Settings entry | Morphe patch settings |
 |:---:|:---:|:---:|:---:|
-| <img src="docs/images/assistant-button.png" width="200"> | <img src="docs/images/assistant-overlay.png" width="200"> | <img src="docs/images/settings-entry.png" width="200"> | <img src="docs/images/morphe-settings-restart.png" width="200"> |
+| <img src="docs/images/assistant-button.png" width="200"> | <img src="docs/images/assistant-overlay.png" width="200"> | <img src="docs/images/settings-entry.png" width="200"> | <img src="docs/images/morphe-settings.png" width="200"> |
 
 ## ⚙️ Turning features on and off
 
@@ -63,6 +63,7 @@ Open **Waze → Settings → Morphe Patch Einstellungen** (at the bottom, above 
 |---|---|
 | Patched YouTube Music Support | After restarting Waze. The page shows a **Restart** button. |
 | Google Assistant Button | Immediately. The button appears or disappears on the map. |
+| ↳ Listen immediately (*Sofort zuhören*) | Immediately. On: the assistant starts listening right after tapping the button. Off: the assistant only opens, tap its microphone to speak. Only available while the button is on. |
 
 * The settings are saved in Waze (`shared_prefs/morphe_patch_settings.xml`) and are kept after a restart.
 * All features are on by default.
@@ -72,15 +73,21 @@ Open **Waze → Settings → Morphe Patch Einstellungen** (at the bottom, above 
 
 ## 🎙️ Google Assistant Button
 
-The button calls [`Activity.showAssist()`](https://developer.android.com/reference/android/app/Activity#showAssist(android.os.Bundle)),
-the official way for an app to show the assistant that is selected as *digital assistant app*
-in the Android settings. This is the same as long-pressing the home button: the assistant shows its own
-overlay on top of Waze, and Waze stays the navigation app below it.
+The button opens the assistant that is selected as *digital assistant app* in the Android settings,
+using the official Android interfaces. The assistant shows its own overlay on top of Waze, and Waze stays
+the navigation app below it.
+
+| Listen immediately | Interface | Behavior (tested with Gemini in the Google app) |
+|---|---|---|
+| On (default) | [`Intent.ACTION_VOICE_COMMAND`](https://developer.android.com/reference/android/content/Intent#ACTION_VOICE_COMMAND) | Overlay opens and the microphone is recording right away |
+| Off | [`Activity.showAssist()`](https://developer.android.com/reference/android/app/Activity#showAssist(android.os.Bundle)) | Overlay opens like long-pressing home, tap the microphone to speak |
+
+The other interface is used as fallback if the first one is not available.
 
 * The look of the assistant overlay is controlled by the assistant app (Google Assistant or Gemini), not by Waze.
   Waze cannot make it more transparent.
-* If no assistant is selected, the button falls back to `Intent.ACTION_VOICE_COMMAND`, which can open the
-  assistant full screen. If that is not available either, a message explains how to select an assistant.
+* If no assistant is available at all, a message explains how to select one.
+* The button slides out and in together with the audio and sound buttons, for example while the map is moved or zoomed.
 * There is no separate speech recognition. All voice commands are handled by the real assistant.
 * The button has the same size (56dp), shadow, colors (day and night) and spacing as the Waze map buttons.
 
@@ -123,7 +130,9 @@ The settings page reads the Waze day/night mode from `AppCompatDelegate` (found 
 
 The map buttons are a Jetpack Compose column (`ButtonPackPortrait`) or row (`ButtonPackLandscape`).
 The patch calls the extension right before the column/row is closed, and the extension adds the button with
-Compose's `AndroidView`. The methods are found by their Compose trace strings
+Compose's `AndroidView`. Waze hides its buttons by sliding them off screen with an offset that it passes to
+every `ButtonPackButton(button, onClick, offsetX, offsetY, ...)` call. The patch passes the same offset to the
+extension, which moves the assistant button with them. The methods are found by their Compose trace strings
 (`com.waze.main_screen.button_pack.ButtonPackPortrait (`), which are not obfuscated.
 
 ## 🧪 Testing status
@@ -140,7 +149,10 @@ deep link `waze://?a=settings`.
 | Switches, saved after restart, restart button, YouTube Music support off after restart | ✅ |
 | Assistant button below the sound button with the same size, color and spacing | ✅ |
 | Assistant button hides/shows immediately when switched | ✅ |
-| Button opens the assistant as overlay on top of Waze (`showAssist`) | ✅ |
+| Button opens the assistant as overlay on top of Waze | ✅ |
+| Listen immediately on: assistant records right away (`ACTION_VOICE_COMMAND`); off: no recording (`showAssist`) | ✅ |
+| Option is disabled while the assistant button is off | ✅ |
+| Button slides out with the other buttons when the map is moved and back in after re-centering; no tap while hidden | ✅ |
 | Assistant button during active navigation | ⚠️ not tested (needs a signed-in Waze) |
 | Landscape layout | ⚠️ not tested |
 | Play/pause/skip of YouTube Music from Waze | ⚠️ not tested |
