@@ -1,3 +1,9 @@
+## [1.3.0](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.2.0...v1.3.0) (2026-10-15)
+
+### ✨ New Features
+
+* Add "Always Play Speed Camera Sound" patch ([985b5c5](https://github.com/Pilotkosinus/morphe-waze-patches/commit/985b5c504515973fc76b4a704c272e144fae366d))
+
 ## [1.3.0-dev.1](https://github.com/Pilotkosinus/morphe-waze-patches/compare/v1.2.0...v1.3.0-dev.1) (2026-10-15)
 
 ### ✨ New Features
