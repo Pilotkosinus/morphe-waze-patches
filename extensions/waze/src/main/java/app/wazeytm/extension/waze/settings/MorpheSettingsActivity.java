@@ -2,6 +2,7 @@ package app.wazeytm.extension.waze.settings;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -16,7 +17,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.net.Uri;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
@@ -38,6 +41,9 @@ import static app.wazeytm.extension.waze.settings.MorpheSettings.text;
  */
 @SuppressWarnings("deprecation")
 public final class MorpheSettingsActivity extends Activity {
+    private static final String AUTHOR = "Pilotkosinus";
+    private static final String REPOSITORY_URL = "https://github.com/Pilotkosinus/morphe-waze-patches";
+
     private final Set<MorpheSettings.Feature> changedRestartFeatures = EnumSet.noneOf(MorpheSettings.Feature.class);
     private final Map<MorpheSettings.Feature, View> rows = new EnumMap<>(MorpheSettings.Feature.class);
     private final Map<MorpheSettings.Feature, Switch> toggles = new EnumMap<>(MorpheSettings.Feature.class);
@@ -148,6 +154,7 @@ public final class MorpheSettingsActivity extends Activity {
                         + "Patches that were not applied cannot be enabled here."), 13, secondaryTextColor);
         footer.setPadding(dp(16), dp(16), dp(16), 0);
         content.addView(footer);
+        content.addView(createCredits());
 
         restartBanner = createRestartBanner();
         restartBanner.setVisibility(View.GONE);
@@ -275,6 +282,44 @@ public final class MorpheSettingsActivity extends Activity {
             entry.getValue().setEnabled(active);
             View row = rows.get(feature);
             if (row != null) row.setAlpha(active ? 1f : 0.5f);
+        }
+    }
+
+    /**
+     * "Made by Pilotkosinus" and a GitHub icon that opens the repository.
+     */
+    private View createCredits() {
+        LinearLayout credits = new LinearLayout(this);
+        credits.setOrientation(LinearLayout.VERTICAL);
+        credits.setGravity(Gravity.CENTER_HORIZONTAL);
+        credits.setPadding(dp(16), dp(32), dp(16), dp(24));
+
+        TextView author = createText(text("Erstellt von " + AUTHOR, "Made by " + AUTHOR), 14, secondaryTextColor);
+        author.setGravity(Gravity.CENTER);
+        credits.addView(author);
+
+        ImageView github = new ImageView(this);
+        int iconId = getResources().getIdentifier("morphe_github_icon", "drawable", getPackageName());
+        if (iconId != 0) {
+            github.setImageResource(iconId);
+            github.setColorFilter(textColor);
+        } else {
+            github.setImageResource(android.R.drawable.ic_menu_info_details);
+        }
+        github.setPadding(dp(8), dp(8), dp(8), dp(8));
+        github.setBackground(selectableBackground());
+        github.setContentDescription(text("GitHub-Repository öffnen", "Open GitHub repository"));
+        github.setOnClickListener(v -> openRepository());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dp(48), dp(48));
+        params.topMargin = dp(4);
+        credits.addView(github, params);
+        return credits;
+    }
+
+    private void openRepository() {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(REPOSITORY_URL)));
+        } catch (ActivityNotFoundException ignored) {
         }
     }
 

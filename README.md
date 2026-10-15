@@ -68,6 +68,8 @@ Open **Waze → Settings → Morphe Patch Einstellungen** (at the bottom, above 
 | Always play speed camera sound (*Blitzer-Warnton immer abspielen*) | Immediately. Off restores the original Waze value. |
 | ↳ Listen immediately (*Sofort zuhören*) | Immediately. On: the assistant starts listening right after tapping the button. Off: the assistant only opens, tap its microphone to speak. Only available while the button is on. |
 
+* The page is shown in German if the device (or Waze) language is German, and in English for every other language.
+* At the bottom, the page shows the author and a GitHub icon that opens this repository.
 * The settings are saved in Waze (`shared_prefs/morphe_patch_settings.xml`) and are kept after a restart.
 * All features are on by default.
 * Only patches that were applied in Morphe Manager can be switched. A patch that was not
