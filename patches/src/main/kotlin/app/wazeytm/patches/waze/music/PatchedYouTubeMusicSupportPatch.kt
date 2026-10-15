@@ -6,6 +6,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.stringOption
 import app.wazeytm.patches.shared.Constants.COMPATIBILITY_WAZE
+import app.wazeytm.patches.shared.EXTENSION_PATH
+import app.wazeytm.patches.shared.markPatchIncluded
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 internal const val EXTENSION_CLASS =
@@ -23,7 +25,7 @@ val patchedYouTubeMusicSupportPatch = bytecodePatch(
 ) {
     compatibleWith(COMPATIBILITY_WAZE)
 
-    extendWith("extensions/waze.mpe")
+    extendWith(EXTENSION_PATH)
 
     val packageNames by stringOption(
         key = "packageNames",
@@ -39,6 +41,8 @@ val patchedYouTubeMusicSupportPatch = bytecodePatch(
     }
 
     execute {
+        markPatchIncluded("patchedYouTubeMusicSupportIncluded")
+
         // Clone the server side YouTube Music partner entry for patched package names.
         UpdateAppListFingerprint.let {
             val moveResult = it.instructionMatches[1]
